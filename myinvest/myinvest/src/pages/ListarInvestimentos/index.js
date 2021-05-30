@@ -1,7 +1,8 @@
 import "antd/dist/antd.css";
 import { Table, Button, message, Layout, Menu } from "antd";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import InvestimentoService from "../../service/InvestimentoService";
 
 const { Header, Content, Footer } = Layout;
 const { Column } = Table;
@@ -10,7 +11,24 @@ export default function ListarInvetimentos(){
 
     const [investimentos, setInvestimentos] = useState([]);
 
+    useEffect(()=> {
+        refreshInvestimentos();
+        return () => {
+        }
+    }, [])
+
+    async function refreshInvestimentos(){
+        InvestimentoService.retrieveAllinvestimentos()
+            .then(
+                response => {
+                    setInvestimentos(response.data)
+                }
+            )
+        
+    }
+
     function remove(record) {
+        InvestimentoService.deleteInvestimento(record.codigo)
         message.success('Investimento removido com sucesso!');
     }
 
@@ -36,10 +54,10 @@ export default function ListarInvetimentos(){
                     <article className="site-layout-content">
                         <h2>INVESTIMENTOS</h2>
                         <Table dataSource={investimentos}>
-                            <Column title="Código do ativo" dataIndex="assetCode" key="assetCode" />
-                            <Column title="Valor" dataIndex="shareValue" key="shareValue" />
-                            <Column title="Quantidade" dataIndex="shareAmout" key="shareAmout" />
-                            <Column title="Data de Compra" dataIndex="buyDate" key="buyDate" />
+                            <Column title="Código do ativo" dataIndex="codigoAtivo" key="codigoAtivo" />
+                            <Column title="Valor" dataIndex="valorCota" key="valor" />
+                            <Column title="Quantidade" dataIndex="quantidadeCotas" key="quantidadeCotas" />
+                            <Column title="Data de Compra" dataIndex="dataCompra" key="dataCompra" />
                             <Column title="Remover" key="atualizar" 
                             render={(text, record)=>(<Button onClick={()=> remove(record)} 
                             type="primary">Remover</Button>)} />

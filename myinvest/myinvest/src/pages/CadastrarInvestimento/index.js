@@ -1,10 +1,33 @@
 import "antd/dist/antd.css";
-import { Form, Button, message, DatePicker, Layout, Menu, Input, InputNumber } from "antd";
+import { Form, Button, message, DatePicker, Layout, Menu, Input, InputNumber, Select} from "antd";
 import { Link } from "react-router-dom";
+import InvestimentoService from "../../service/InvestimentoService";
+import CategoriaService from "../../service/CategoriaService";
+import { useState, useEffect } from 'react';
 
 const { Header, Content, Footer } = Layout;
+const { Option } = Select;
 
 export default function CadastrarInvestimento() {
+
+    const [categorias, setCategorias] = useState([]);
+    const [categoria, setCategoria] = useState(null);
+
+    useEffect(()=> {
+        refreshCategorias();
+        return () => {
+        }
+    }, [])
+
+    async function refreshCategorias(){
+        CategoriaService.retrieveAllCategorias()
+            .then(
+                response => {
+                    setCategorias(response.data)
+                }
+            )
+        
+    }
 
     const layout = {
         labelCol: { span: 4 },
@@ -15,10 +38,15 @@ export default function CadastrarInvestimento() {
       };
 
     const onFinish = (values) => {
+        InvestimentoService.saveInvestimento(values);
         message.success("Investimento salvo com sucesso!");
     };
 
-    
+    function handleChange(value){
+        setCategoria(value);
+
+    }
+
     return(
         <main className="container">
             <Layout className="layout">
@@ -44,7 +72,7 @@ export default function CadastrarInvestimento() {
                             initialValues={{ remember: true, }} 
                             onFinish={onFinish} >
                             
-                            <Form.Item label="Código do ativo" name="assetCode" rules={[
+                            <Form.Item label="Código do ativo" name="codigoAtivo" rules={[
                                 {
                                     required: true,
                                     message: 'Insira o código do ativo!'
@@ -53,7 +81,7 @@ export default function CadastrarInvestimento() {
                                 <Input />
                             </Form.Item>
 
-                            <Form.Item label="Valor" name="shareValue" rules={[
+                            <Form.Item label="Valor" name="valorCota" rules={[
                                 {
                                     required: true,
                                     message: 'Insira o valor da cota!'
@@ -62,7 +90,7 @@ export default function CadastrarInvestimento() {
                                 <Input />
                             </Form.Item>
 
-                            <Form.Item label="Quantidade de Cotas" name="shareAmount" rules={[
+                            <Form.Item label="Quantidade de Cotas" name="quantidadeCotas" rules={[
                                 {
                                     required: true,
                                     message: 'Insira a quantidade de cotas!'
@@ -71,13 +99,27 @@ export default function CadastrarInvestimento() {
                                 <InputNumber />
                             </Form.Item>
 
-                            <Form.Item label="Data da Compra" name="buyDate" rules={[
+                            <Form.Item label="Data da Compra" name="dataCompra" rules={[
                                 {
                                     required: true,
                                     message: 'Insira a data da compra!'
                                 },
                             ]}>
                                 <DatePicker />
+                            </Form.Item>
+
+
+                            <Form.Item label="Categoria" name="categoria" >
+                                <Select style={{ width: '50%' }} onChange={handleChange}>
+                                    {categorias.map((item, index) => {
+                                        return(
+                                            <Option key={item.id} value={item.id}>
+                                                {item.nome}
+                                            </Option>
+                                        )
+                                    })}
+
+                                </Select>
                             </Form.Item>
 
                             <Form.Item { ... tailLayout}>

@@ -16,7 +16,7 @@ import br.com.silviocesararaujo.myinvest.domain.Investimento;
 import br.com.silviocesararaujo.myinvest.repository.InvestimentoRepository;
 
 @RestController
-@RequestMapping("/investimentos")
+@RequestMapping("/Investimentos")
 @CrossOrigin(origins = "http://localhost:3000")
 public class InvestimentoResource {
 	
